@@ -1,16 +1,18 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const validator = require("validator");
 
 const userSchema = mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true
+      required: true,
+      minLength: 4,
+      maxLength: 50
     },
     lastName: {
-      type: String,
-      required: true
+      type: String
     },
     emailId: {
       type: String,
@@ -18,16 +20,20 @@ const userSchema = mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      validate: {
-        validator: function (v) {
-          return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid email!`
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address: " + value);
+        }
       }
     },
     password: {
       type: String,
-      required: true
+      required: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a strong Password: " + value);
+        }
+      }
     },
     age: {
       type: Number,
@@ -37,10 +43,28 @@ const userSchema = mongoose.Schema(
       type: String,
       enum: ["male", "female", "0thers"],
       message: `{VALUE} is not a valid gender type`
+    },
+    photoUrl: {
+      type: String,
+      default: "https://geographyandyou.com/images/user-profile.png",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL: " + value);
+        }
+      }
+    },
+    about: {
+      type: String,
+      default: "This is a default about the user!"
+    },
+    skills: {
+      type: [String]
     }
   },
   { timestamps: true }
 );
+
+userSchema.index({ firstName: 1, lastName: 1 });
 
 userSchema.methods.getJWT = async function () {
   const user = this;
