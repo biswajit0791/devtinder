@@ -10,8 +10,7 @@ requestRouter.post(
   async (req, res) => {
     try {
       const fromUserId = req.user._id;
-      const toUserId = req.params.toUserId;
-      const status = req.params.status;
+      const { toUserId, status } = req.params;
       const allowedStatus = ["ignored", "interested"];
       if (fromUserId === toUserId) {
         throw new Error("You can not send connection request to yourself ");
@@ -59,7 +58,7 @@ requestRouter.post(
   userAuth,
   async (req, res) => {
     try {
-      const { status, requestId } = req.params.status;
+      const { status, requestId } = req.params;
       const toUserId = req.user._id;
       const allowedStatus = ["accepted", "rejected"];
       if (!allowedStatus.includes(status)) {
@@ -68,7 +67,7 @@ requestRouter.post(
           .json({ message: `${status} Status is not allowed` });
       }
 
-      const connectionRequest = ConnectionRequest.findOne({
+      const connectionRequest = await ConnectionRequest.findOne({
         _id: requestId,
         toUserId,
         status: "interested"
