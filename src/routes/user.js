@@ -8,7 +8,9 @@ const USER_SAFE_LIST = [
   "lastName",
   "photoUrl",
   "skills",
-  "gender"
+  "gender",
+  "about",
+  "age"
 ];
 
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
