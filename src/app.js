@@ -7,7 +7,7 @@ const authRouter = require("./routes/auth");
 const requestRouter = require("./routes/request");
 const profileRouter = require("./routes/profile");
 const userRouter = require("./routes/user");
-
+require("dotenv").config();
 const corsOptions = {
   origin: "http://localhost:5173", // Your React dev server
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -34,7 +34,7 @@ app.use("/", userRouter);
 connectDB()
   .then(() => {
     console.log("Database connection established.");
-    app.listen(7777, () => {
+    app.listen(process.env.PORT, () => {
       console.log("Server is successfully listening on port 7777...");
     });
   })
